@@ -1,0 +1,6 @@
+.idea
+**/.ipynb_checkpoints
+.pytest_cache
+
+# temp file produced by plotly
+temp-plot.html
