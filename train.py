@@ -7,17 +7,14 @@ from sklearn.metrics import roc_auc_score, accuracy_score
 from tabulate import tabulate
 
 from etl.transform import load_raw_data, transform_input_df
-from config import DIR_PROJ, TARGET_NAME, get_params_xgboost, get_feat_names
+from config import DIR_ARTIFACTS, FILE_MODEL_XGBOOST, FILE_LOGS, TARGET_NAME, get_params_xgboost, get_feat_names
 
 # create dir for artifacts if not existing
-if not os.path.exists(f'{DIR_PROJ}/artifacts'):
-    os.makedirs(f'{DIR_PROJ}/artifacts')
+if not os.path.exists(DIR_ARTIFACTS):
+    os.makedirs(DIR_ARTIFACTS)
 
 # set logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    handlers=[logging.FileHandler(f'{DIR_PROJ}/artifacts/logs.log'), logging.StreamHandler()]
-)
+logging.basicConfig(level=logging.DEBUG, handlers=[logging.FileHandler(FILE_LOGS), logging.StreamHandler()])
 
 logging.info('load and prep data')
 df = load_raw_data()
@@ -46,11 +43,10 @@ feat_imp = pd.DataFrame({'feature': feat_names, 'importance': model.feature_impo
 logging.info(' - feature importance (top 20): \n'
              + tabulate(feat_imp.head(20), headers=feat_imp.columns, showindex=False))
 
-file_model = f'{DIR_PROJ}/artifacts/model_xgboost.json'
-logging.info(f'save model artifact to: {file_model}')
-model.save_model(file_model)
+logging.info(f'save model artifact to: {FILE_MODEL_XGBOOST}')
+model.save_model(FILE_MODEL_XGBOOST)
 
 logging.info('check if model can be loaded from disk:')
-model_loaded = Booster(model_file=file_model)
+model_loaded = Booster(model_file=FILE_MODEL_XGBOOST)
 y_pred_check = model.predict(df[feat_names])
 assert all(np.array(y_pred == y_pred_check))
