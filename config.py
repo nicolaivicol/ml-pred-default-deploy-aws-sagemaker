@@ -1,3 +1,5 @@
+# This contains all configs/parameters used in this project.
+
 from pathlib import Path
 import os
 import json
