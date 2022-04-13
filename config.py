@@ -11,7 +11,8 @@ DIR_ARTIFACTS = f'{DIR_PROJ}/artifacts'
 
 FILE_DATA = f'{DIR_PROJ}/data/dataset.csv'
 FILE_PARAMS_XGBOOST_BEST_BY_CV = f'{DIR_ARTIFACTS}/params_xgboost_best_by_cv.json'
-FILE_SELECTED_FEATS_BY_CV = f'{DIR_ARTIFACTS}/selected_feats_by_cv.json'
+FILE_SLCT_FEATS = f'{DIR_ARTIFACTS}/selected_feats.json'
+FILE_RES_SLCT_FEATS_BORUTA = f'{DIR_ARTIFACTS}/boruta_res_slct_feats.csv'
 FILE_LOGS = f'{DIR_ARTIFACTS}/logs.log'
 FILE_MODEL_XGBOOST = f'{DIR_ARTIFACTS}/model_xgboost.json'
 FILE_CV_RES_BEST_PARAMS_SEARCH = f'{DIR_ARTIFACTS}/cv_res_best_params_search.csv'
@@ -145,7 +146,7 @@ def get_params_xgboost():
 
 def get_feat_names():
     feat_names = FEAT_NAMES.copy()
-    if os.path.exists(FILE_SELECTED_FEATS_BY_CV):
-        with open(FILE_SELECTED_FEATS_BY_CV, 'r') as f:
+    if os.path.exists(FILE_SLCT_FEATS):
+        with open(FILE_SLCT_FEATS, 'r') as f:
             feat_names = json.load(f)
     return feat_names
