@@ -84,15 +84,16 @@ PARAMS_XGBOOST_DEFAULT = {
     # booster:
     "objective": "binary:logistic",
     "use_label_encoder": False,
-    "eval_metric": "logloss",
+    "eval_metric": "auc", # "logloss",
     "booster": "gbtree",
     "n_estimators": 500,
-    "learning_rate": 0.10,
-    "max_depth": 3,  # 4,
-    "max_leaves": 8,  # 15,
-    "colsample_bytree": 0.70,
-    "subsample": 0.70,
+    "learning_rate": 0.02,
+    "max_depth": 4,  # 3,
+    "max_leaves": 15,  # 8,
+    "colsample_bytree": 0.50,
+    "subsample": 0.50,
     "gamma": 0.01,
+    "scale_pos_weight": 1,
     "verbosity": 1,
     "seed": 42,
     # "enable_categorical": False,
@@ -114,6 +115,7 @@ PARAMS_GRID = {
     'subsample': [0.50, 0.70, 0.90],
     'gamma': [0.01, 0.5, 1, 3],
     'min_child_weight': [1, 5, 10],
+    'scale_pos_weight': [1, 10, 70, 100],
 }
 
 # set logging configs
