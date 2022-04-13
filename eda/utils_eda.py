@@ -287,8 +287,8 @@ def plot_agg_target_by_feat(y_agg, x_labels, bins_size=None, y_agg_full=None,
     return fig
 
 
-def plot_agg_target_by_feat_env(d, name_feat, type_feat='num', target_name='default', y2_range=None, min_size=0.0025,
-                                show_legend=True):
+def plot_agg_target_by_feat_env(d, name_feat, type_feat='num', target_name='default',
+                                y2_range=None, min_size=0.0025, show_legend=True):
     """
     Envelope on function plot_agg_target_by_feat
     :param d: data frame

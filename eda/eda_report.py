@@ -11,9 +11,8 @@
 - [Descriptive summary](#descriptive_summary)  
     - [Numeric columns](#numeric_columns)    
     - [Categorical columns](#categorical_columns)    
+- [Plot default rate by main categorical features](#plot_by_cat_feats)
 - [Plot default rate by main numeric features](#plot_by_num_feats)
-- [Plot default rate by main categorical features](#plot_by_num_feats)
-- [XXX](#xxx)
 '''
 
 # %%
@@ -25,17 +24,12 @@
 # %%
 # load libs
 import os
-import pandas as pd
 import numpy as np
-import random
-from pathlib import Path
-import plotly.graph_objects as go
+# from pathlib import Path
+# import plotly.graph_objects as go
 import plotly.offline as py
-import plotly.io as pio
-from plotly.subplots import make_subplots
-from IPython.display import display, HTML
-import lightgbm
-from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error
+# from plotly.subplots import make_subplots
+from IPython.display import display
 
 # cd at project's root folder to load modules
 DIR_PROJ = 'klrn'
@@ -49,8 +43,14 @@ else:
 # DIR_PROJ = (Path(__file__) / '..' / '..').resolve()
 
 # load project modules
-from eda.utils import describe_numeric, display_descr_cat_freq, set_display_options, plot_agg_target_by_feat_env
-from config import MAP_DATA_TYPES
+from config import MAP_DATA_TYPES, TARGET_NAME
+from eda.utils_eda import (
+    describe_numeric,
+    display_descr_cat_freq,
+    set_display_options,
+    plot_agg_target_by_feat_env,
+)
+from etl import load_raw_data
 
 # options
 set_display_options()
@@ -63,7 +63,7 @@ set_display_options()
 '''
 
 # %%
-df = pd.read_csv(f'{DIR_PROJ}/data/dataset.csv', sep=';', na_values=['NA'])
+df = load_raw_data()
 
 # %%
 print(f"Rows: {df.shape[0]}   Columns: {df.shape[1]}")
@@ -80,14 +80,14 @@ These are the values we need to predict (test).
 '''
 
 # %%
-target_is_na = df['default'].isna()
-print(f"Default rate: {round(df.loc[~target_is_na, 'default'].mean()*100, 2)}%")
+target_is_na = df[TARGET_NAME].isna()
+print(f"Default rate: {round(df.loc[~target_is_na, TARGET_NAME].mean()*100, 2)}%")
 print(f"Percentage of NA values (to be predicted): {round(np.mean(target_is_na)*100, 2)}%")
 
 # %%
 ''' 
 <a id="descriptive_summary"></a> 
-## Descriptive summary of all data 
+## Descriptive summary
 '''
 
 # %%
@@ -110,7 +110,6 @@ display(describe_numeric(df, cols_numeric))
 cols_categorical = [k for k, v in MAP_DATA_TYPES.items() if v in ['categorical', 'boolean']]
 display(display_descr_cat_freq(df, cols_categorical))
 
-
 # %%
 ''' 
 <a id="plot_by_cat_feats"></a>  
@@ -118,7 +117,17 @@ display(display_descr_cat_freq(df, cols_categorical))
 '''
 
 # %%
-cols = ['account_status', 'merchant_category', 'has_paid']
+cols = [
+    'status_max_archived_0_24_months',
+    'account_worst_status_0_3m',
+    'status_last_archived_0_24m',
+    'account_worst_status_6_12m',
+    'worst_status_active_inv',
+    'account_worst_status_3_6m',
+    'account_status',
+    'status_2nd_last_archived_0_24m',
+    'merchant_group',
+]
 for col in cols:
     fig = plot_agg_target_by_feat_env(df, col, 'cat', min_size=0)
     py.iplot(fig)
@@ -131,11 +140,16 @@ for col in cols:
 
 # %%
 cols = [
-    'account_amount_added_12_24m',
-    'account_incoming_debt_vs_paid_0_24m',
-    'age',
+    'num_arch_ok_0_12m',
+    'num_unpaid_bills',
+    'num_active_div_by_paid_inv_0_12m',
     'avg_payment_span_0_12m',
+    'num_arch_dc_0_12m',
     'num_active_inv',
+    'recovery_debt',
+    'age',
+    'num_arch_dc_12_24m',
+    'max_paid_inv_0_24m',
 ]
 for col in cols:
     fig = plot_agg_target_by_feat_env(df, col, 'num', min_size=0)
@@ -158,4 +172,3 @@ cd /Users/nicolaiv/work/misc/klrn
 conda activate klrn-hw   
 jupyter notebook --notebook-dir=work/git/nicv-onboard-churn/   
 '''
-
