@@ -72,10 +72,13 @@ MAP_ENC_CAT = {
     'merchant_category': [
         'Diversified entertainment', 'Youthful Shoes & Clothing', 'Books & Magazines',
         'General Shoes & Clothing', 'Concept stores & Miscellaneous', 'Sports gear & Outdoor',
+        'Dietary supplements', 'Diversified children products', 'Diversified electronics',
+        'Prints & Photos', 'Children Clothes & Nurturing products',
     ],
     'merchant_group': [
         'Entertainment', 'Clothing & Shoes', 'Leisure, Sport & Hobby', 'Health & Beauty',
         'Children Products', 'Home & Garden', 'Electronics', 'Intangible products',
+        'Jewelry & Accessories', 'Automotive Products', 'Erotic Materials',
     ]
 }
 
@@ -92,7 +95,7 @@ PARAMS_XGBOOST_DEFAULT = {
     "max_leaves": 15,  # 8,
     "colsample_bytree": 0.50,
     "subsample": 0.50,
-    "gamma": 0.01,
+    "gamma": 1,
     "scale_pos_weight": 1,
     "verbosity": 1,
     "seed": 42,

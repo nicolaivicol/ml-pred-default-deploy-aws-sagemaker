@@ -47,13 +47,13 @@ logger.info(f' - accuracy (train) = {acc_:0.3f}')
 feat_imp = pd.DataFrame({'feature': feat_names, 'importance': model.feature_importances_})\
     .sort_values(['importance'], ascending=False)\
     .reset_index(drop=True)
-logger.info(' - feature importance (top 20): \n'
-             + tabulate(feat_imp.head(20), headers=feat_imp.columns, showindex=False))
+logger.info(' - feature importance (top 25): \n'
+            + tabulate(feat_imp.head(25), headers=feat_imp.columns, showindex=False) + '\n')
 
 logger.info(f'save model artifact to disk: {FILE_MODEL_XGBOOST}')
 model.save_model(FILE_MODEL_XGBOOST)
 
-logger.info('check if model can be loaded from disk:')
+logger.info('check if model can be loaded from disk')
 model_loaded = Booster(model_file=FILE_MODEL_XGBOOST)
 y_pred_check = model.predict(df[feat_names])
 assert all(np.array(y_pred == y_pred_check))
