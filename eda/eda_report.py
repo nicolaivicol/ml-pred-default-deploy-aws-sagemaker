@@ -118,15 +118,18 @@ display(display_descr_cat_freq(df, cols_categorical))
 
 # %%
 cols = [
-    'status_max_archived_0_24_months',
     'account_worst_status_0_3m',
     'status_last_archived_0_24m',
-    'account_worst_status_6_12m',
-    'worst_status_active_inv',
-    'account_worst_status_3_6m',
-    'account_status',
+    'status_max_archived_0_24_months',
     'status_2nd_last_archived_0_24m',
+    'status_max_archived_0_12_months',
+    'account_status',
+    'account_worst_status_6_12m',
+    'status_3rd_last_archived_0_24m',
+    'has_paid',
     'merchant_group',
+    'account_worst_status_3_6m',
+    'worst_status_active_inv',
 ]
 for col in cols:
     fig = plot_agg_target_by_feat_env(df, col, 'cat', min_size=0)
@@ -141,15 +144,17 @@ for col in cols:
 # %%
 cols = [
     'num_arch_ok_0_12m',
+    'num_arch_ok_12_24m',
     'num_unpaid_bills',
-    'num_active_div_by_paid_inv_0_12m',
     'avg_payment_span_0_12m',
-    'num_arch_dc_0_12m',
+    'num_active_div_by_paid_inv_0_12m',
+    'avg_payment_span_0_3m',
     'num_active_inv',
-    'recovery_debt',
     'age',
-    'num_arch_dc_12_24m',
+    'recovery_debt',
+    'num_arch_dc_0_12m',
     'max_paid_inv_0_24m',
+    'num_arch_dc_12_24m',
 ]
 for col in cols:
     fig = plot_agg_target_by_feat_env(df, col, 'num', min_size=0)
