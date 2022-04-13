@@ -16,6 +16,7 @@ FILE_RES_SLCT_FEATS_BORUTA = f'{DIR_ARTIFACTS}/boruta_res_slct_feats.csv'
 FILE_LOGS = f'{DIR_ARTIFACTS}/logs.log'
 FILE_MODEL_XGBOOST = f'{DIR_ARTIFACTS}/model_xgboost.json'
 FILE_CV_RES_BEST_PARAMS_SEARCH = f'{DIR_ARTIFACTS}/cv_res_best_params_search.csv'
+FILE_CV_RES = f'{DIR_ARTIFACTS}/cv_res.json'
 
 MAP_DATA_TYPES = {
     'uuid': 'text',
