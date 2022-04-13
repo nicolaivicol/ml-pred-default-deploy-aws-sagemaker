@@ -74,6 +74,6 @@ logger.info(
 df_cv_results.to_csv(FILE_CV_RES_BEST_PARAMS_SEARCH, index=False, float_format='%.3f')
 
 with open(FILE_PARAMS_XGBOOST_BEST_BY_CV, 'w') as fp:
-    json.dump(rnd_search.best_params_, fp)
+    json.dump(rnd_search.best_params_, fp, indent=2)
 
 logger.info('END tune_hyper_params.py')
