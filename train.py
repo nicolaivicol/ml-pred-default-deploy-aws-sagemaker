@@ -7,7 +7,7 @@ from xgboost import XGBClassifier, Booster
 from sklearn.metrics import roc_auc_score, accuracy_score
 from tabulate import tabulate
 
-from etl.transform import load_raw_data, transform_input_df
+from etl import load_raw_data, transform_input_df
 from config import DIR_ARTIFACTS, FILE_MODEL_XGBOOST, TARGET_NAME, get_params_xgboost, get_feat_names
 
 # create dir for artifacts if not existing
