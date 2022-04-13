@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from etl.transform import load_raw_data, transform_input_df
+from etl import load_raw_data, transform_input_df
 
 
 class TestETL(unittest.TestCase):
