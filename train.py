@@ -7,7 +7,7 @@ from xgboost import XGBClassifier, Booster
 from sklearn.metrics import roc_auc_score, accuracy_score
 from tabulate import tabulate
 
-from etl import load_raw_data, transform_input_df
+from etl import load_transform_data
 from config import DIR_ARTIFACTS, FILE_MODEL_XGBOOST, TARGET_NAME, get_params_xgboost, get_feat_names
 
 # create dir for artifacts if not existing
@@ -19,10 +19,7 @@ logger = logging.getLogger('train.py')
 logger.info('START train.py')
 
 logger.info('load and prep data')
-df = load_raw_data()
-df = transform_input_df(df)
-df_test = df.loc[df[TARGET_NAME].isna(), ]  # portion of data with unknown target
-df = df.loc[~df[TARGET_NAME].isna(), ]
+df = load_transform_data()
 logger.info(f'data loaded: rows: {df.shape[0]} | columns: {df.shape[1]}')
 
 logger.info('load train configs')
