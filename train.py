@@ -36,7 +36,7 @@ model = XGBClassifier(**params_xgboost)
 _ = model.fit(df[feat_names], df[TARGET_NAME])
 
 logger.info('model summary:')
-y_pred_prob = pd.DataFrame(model.predict_proba(df[feat_names]))[1]
+y_pred_prob = model.predict_proba(df[feat_names])[:, 1]
 auc_score_ = roc_auc_score(df[TARGET_NAME], y_pred_prob)
 logger.info(f' - AUC (train) = {auc_score_:.3f}')
 
