@@ -1,3 +1,4 @@
+import os
 import json
 import pandas as pd
 import logging
@@ -9,7 +10,11 @@ import time
 from etl import load_transform_data
 from config import TARGET_NAME, get_feat_names, PARAMS_XGBOOST_DEFAULT, \
     FILE_CV_RES_BEST_PARAMS_SEARCH, FILE_PARAMS_XGBOOST_BEST_BY_CV, \
-    N_ITER, TEST_SIZE, N_SPLITS, RANDOM_STATE, PARAMS_GRID
+    DIR_ARTIFACTS, N_ITER, TEST_SIZE, N_SPLITS, RANDOM_STATE, PARAMS_GRID
+
+# create dir for artifacts if not existing
+if not os.path.exists(DIR_ARTIFACTS):
+    os.makedirs(DIR_ARTIFACTS)
 
 logger = logging.getLogger('tune_hyper_params')
 logger.info('START tune_hyper_params.py')
