@@ -74,7 +74,7 @@ display(df.head(5))
 <a id="target"></a>  
 ## Target 
 The target is binary telling whether a client has defaulted (default=1) or not (default=0). 
-The default rate on the provided sample is about **1.43%**.
+The default rate on the provided sample is about **1.43%**. That is a highly imbalanced dataset.
 There are **10,000** NA values in the target column 'default' (**10%** out the total sample of 99,976 rows). 
 These are the values we need to predict (test).
 '''
