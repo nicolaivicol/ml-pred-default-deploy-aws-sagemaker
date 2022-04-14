@@ -1,79 +1,70 @@
-import os
 import json
 import pandas as pd
 import logging
-from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV, train_test_split
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
 from xgboost import XGBClassifier
 from tabulate import tabulate
 import time
 
-from etl import load_transform_data
-from config import TARGET_NAME, get_feat_names, PARAMS_XGBOOST_DEFAULT, \
-    FILE_CV_RES_BEST_PARAMS_SEARCH, FILE_PARAMS_XGBOOST_BEST_BY_CV, \
-    DIR_ARTIFACTS, N_ITER, TEST_SIZE, N_SPLITS, RANDOM_STATE, PARAMS_GRID
+import config
+from etl import load_train_test_data
 
-# create dir for artifacts if not existing
-if not os.path.exists(DIR_ARTIFACTS):
-    os.makedirs(DIR_ARTIFACTS)
 
-logger = logging.getLogger('tune_hyper_params')
-logger.info('START tune_hyper_params.py')
-logger.info(
-    f'Params for hyper parameter tuning: \n'
-    f'N_ITER: {N_ITER} \n'
-    f'TEST_SIZE: {TEST_SIZE} \n'
-    f'N_SPLITS: {N_SPLITS} \n'
-    f'RANDOM_STATE: {RANDOM_STATE} \n'
-    f'PARAMS_GRID: \n'
-    f'{json.dumps(PARAMS_GRID, indent=2)}'
-)
+def tune_hyper_params():
+    logger = logging.getLogger('tune_hyper_params.py')
+    logger.info('START - Tune hyper-parameters')
+    logger.debug(
+        f'Parameters: \n'
+        f' - N_ITER: {config.TUNE_N_ITER} \n'
+        f' - N_SPLITS: {config.TUNE_N_SPLITS} \n'
+        f' - PARAMS_GRID: \n'
+        f'{json.dumps(config.TUNE_PARAMS_GRID, indent=2)}'
+    )
 
-logger.info('Load and prepare data')
-df = load_transform_data()
-X_train, X_test, y_train, y_test = train_test_split(
-    df[get_feat_names()],
-    df[TARGET_NAME],
-    test_size=TEST_SIZE,
-    random_state=RANDOM_STATE,
-)
+    logger.info('Load data')
+    X_train, X_test, y_train, y_test = load_train_test_data()
 
-logger.info('Search of parameters')
-tic = time.time()
-model_xgb = XGBClassifier(**PARAMS_XGBOOST_DEFAULT)
-skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=RANDOM_STATE)
-rnd_search = RandomizedSearchCV(
-    estimator=model_xgb,
-    param_distributions=PARAMS_GRID,
-    n_iter=N_ITER,
-    scoring='roc_auc',
-    n_jobs=-1,
-    cv=skf.split(X_train, y_train),
-    verbose=10,
-    random_state=RANDOM_STATE,
-)
-rnd_search.fit(X_train, y_train)
-logger.info(f'Search of parameters completed. Time elapsed: {((time.time() - tic) / 60):0.2f} minutes')
+    logger.info('Search of parameters')
+    tic = time.time()
+    model_xgb = XGBClassifier(**config.PARAMS_MODEL_DEFAULT)
+    skf = StratifiedKFold(n_splits=config.TUNE_N_SPLITS, shuffle=True, random_state=config.TUNE_RANDOM_STATE)
+    search_cv = RandomizedSearchCV(
+        estimator=model_xgb,
+        param_distributions=config.TUNE_PARAMS_GRID,
+        n_iter=config.TUNE_N_ITER,
+        scoring=config.TUNE_SCORING,
+        n_jobs=-1,
+        cv=skf.split(X_train, y_train),
+        verbose=10,
+        random_state=config.TUNE_RANDOM_STATE,
+    )
+    search_cv.fit(X_train, y_train)
+    logger.info(f'Search of parameters completed. Time elapsed: {((time.time() - tic) / 60):0.2f} minutes')
 
-logger.info(
-    f'Metrics:\n'
-    f' - AUC score (CV): {rnd_search.best_score_:0.3f} \n'
-    f' - AUC score (train): {rnd_search.score(X_train, y_train):0.3f} \n'
-    f' - AUC score (test): {rnd_search.score(X_test, y_test):0.3f} \n'
-)
+    logger.info(
+        f'Metrics:\n'
+        f' - AUC score (best found in CV): {search_cv.best_score_:0.3f} \n'
+        f' - AUC score (train): {search_cv.score(X_train, y_train):0.3f} \n'
+        f' - AUC score (test): {search_cv.score(X_test, y_test):0.3f} \n'
+    )
 
-df_cv_results = pd.DataFrame(rnd_search.cv_results_).sort_values(by=['rank_test_score']).reset_index(drop=True)
-cols_show = [f'param_{p}' for p in PARAMS_GRID.keys()] + ['mean_test_score', 'std_test_score', 'mean_fit_time']
-logger.info(' - CV results: \n' + tabulate(df_cv_results[cols_show].head(25), headers=cols_show, showindex=False))
-logger.info(' - Best parameters found: \n' + json.dumps(rnd_search.best_params_, indent=2))
+    df_cv_results = pd.DataFrame(search_cv.cv_results_).sort_values(by=['rank_test_score']).reset_index(drop=True)
+    cols_show = [f'param_{p}' for p in config.TUNE_PARAMS_GRID.keys()] + ['mean_test_score', 'std_test_score', 'mean_fit_time']
+    logger.info(' - CV results: \n' + tabulate(df_cv_results[cols_show].head(25), headers=cols_show, showindex=False))
+    logger.info(' - Best parameters found: \n' + json.dumps(search_cv.best_params_, indent=2))
 
-logger.info(
-    f'Save artifacts: \n'
-    f' - CV results to: {FILE_CV_RES_BEST_PARAMS_SEARCH} \n'
-    f' - Best params to: {FILE_PARAMS_XGBOOST_BEST_BY_CV}'
-)
-df_cv_results.to_csv(FILE_CV_RES_BEST_PARAMS_SEARCH, index=False, float_format='%.3f')
+    logger.info(
+        f'Save artifacts: \n'
+        f' - CV results to: {config.FILE_TUNE_ALL_PARAMS_COMBS} \n'
+        f' - Best params to: {config.FILE_TUNE_PARAMS_BEST}'
+    )
+    config.make_dir_for_artifacts()
+    df_cv_results.to_csv(config.FILE_TUNE_ALL_PARAMS_COMBS, index=False, float_format='%.3f')
+    with open(config.FILE_TUNE_PARAMS_BEST, 'w') as f:
+        json.dump(search_cv.best_params_, f, indent=2)
 
-with open(FILE_PARAMS_XGBOOST_BEST_BY_CV, 'w') as fp:
-    json.dump(rnd_search.best_params_, fp, indent=2)
+    logger.info('END - Tune hyper-parameters')
 
-logger.info('END tune_hyper_params.py')
+
+if __name__ == "__main__":
+    tune_hyper_params()

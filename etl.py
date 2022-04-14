@@ -1,12 +1,15 @@
 # this has utils to load, transform data prior to feed to the model
 import numpy as np
 import pandas as pd
-from config import MAP_DATA_TYPES, MAP_ENC_CAT, FILE_DATA, TARGET_NAME
+from typing import Tuple
+from sklearn.model_selection import train_test_split
 
+import config
+from config import MAP_DATA_COLS_TYPES, MAP_ENC_CAT, FILE_DATA, TARGET_NAME
 
-cols_numeric = [k for k, v in MAP_DATA_TYPES.items() if v == 'numeric']
-cols_boolean = [k for k, v in MAP_DATA_TYPES.items() if v in ['boolean']]
-cols_categorical = [k for k, v in MAP_DATA_TYPES.items() if v in ['categorical', 'boolean']]
+cols_numeric = [k for k, v in MAP_DATA_COLS_TYPES.items() if v == 'numeric']
+cols_boolean = [k for k, v in MAP_DATA_COLS_TYPES.items() if v in ['boolean']]
+cols_categorical = [k for k, v in MAP_DATA_COLS_TYPES.items() if v in ['categorical', 'boolean']]
 cols_categorical_text = ['merchant_category', 'merchant_group', 'name_in_email']
 cols_categorical_int = [c for c in cols_categorical if c not in (cols_categorical_text + cols_boolean)]
 
@@ -76,3 +79,31 @@ def load_transform_data(file_data=None, filter_na_target=False, enable_categoric
         return df.loc[df[TARGET_NAME].isna(),]  # portion of data with unknown target
     else:
         return df.loc[~df[TARGET_NAME].isna(),]
+
+
+def load_train_test_data(selected_feats_only=False) -> Tuple[pd.DataFrame, pd.DataFrame, pd.array, pd.array]:
+    """
+    Load train/test data
+    :param selected_feats_only: load data only with selected features? Default: False
+    :return: X_train, X_test, y_train, y_test
+    """
+    df = load_transform_data()
+    feat_names = config.get_feat_names() if selected_feats_only else config.FEAT_NAMES.copy()
+    X_train, X_test, y_train, y_test = train_test_split(
+        df[feat_names],
+        df[config.TARGET_NAME],
+        test_size=config.TEST_SIZE,
+        random_state=config.TEST_RANDOM_STATE,
+    )
+    return X_train, X_test, y_train, y_test
+
+
+def load_full_train_data() -> Tuple[pd.DataFrame, pd.array]:
+    """
+    Load full train data
+    :return: X_train, y_train
+    """
+    df = load_transform_data()
+    feat_names = config.get_feat_names()
+    X_train, y_train = df[feat_names], df[config.TARGET_NAME]
+    return X_train, y_train

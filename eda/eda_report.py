@@ -43,7 +43,7 @@ else:
 # DIR_PROJ = (Path(__file__) / '..' / '..').resolve()
 
 # load project modules
-from config import MAP_DATA_TYPES, TARGET_NAME
+from config import MAP_DATA_COLS_TYPES, TARGET_NAME
 from eda.utils_eda import (
     describe_numeric,
     display_descr_cat_freq,
@@ -97,7 +97,7 @@ print(f"Percentage of NA values (to be predicted): {round(np.mean(target_is_na)*
 '''
 
 # %%
-cols_numeric = [k for k, v in MAP_DATA_TYPES.items() if v == 'numeric']
+cols_numeric = [k for k, v in MAP_DATA_COLS_TYPES.items() if v == 'numeric']
 display(describe_numeric(df, cols_numeric))
 
 # %%
@@ -107,7 +107,7 @@ display(describe_numeric(df, cols_numeric))
 '''
 
 # %%
-cols_categorical = [k for k, v in MAP_DATA_TYPES.items() if v in ['categorical', 'boolean']]
+cols_categorical = [k for k, v in MAP_DATA_COLS_TYPES.items() if v in ['categorical', 'boolean']]
 display(display_descr_cat_freq(df, cols_categorical))
 
 # %%
@@ -175,5 +175,5 @@ ipynb-py-convert eda/eda_report.py eda/eda_report.ipynb
 **Start python notebook:**      
 cd /Users/nicolaiv/work/misc/klrn    
 conda activate klrn-hw   
-jupyter notebook --notebook-dir=work/git/nicv-onboard-churn/   
+jupyter notebook  
 '''
