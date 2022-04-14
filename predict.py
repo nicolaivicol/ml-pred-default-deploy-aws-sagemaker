@@ -9,6 +9,7 @@ from etl import load_predict_data
 
 
 def predict():
+    """Predict on data provided locally"""
     logger = logging.getLogger('predict.py')
     logger.info('START - Predict')
 

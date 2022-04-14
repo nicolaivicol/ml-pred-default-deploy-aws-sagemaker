@@ -12,6 +12,7 @@ from etl import load_train_test_data
 
 
 def select_feats():
+    """Perform feature selection with Boruta"""
     logger = logging.getLogger('select_feats.py')
     logger.info('START - Feature selection')
 

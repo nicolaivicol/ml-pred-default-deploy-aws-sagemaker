@@ -11,6 +11,7 @@ from etl import load_full_train_data
 
 
 def train():
+    """Train the model and save it locally"""
     logger = logging.getLogger('train.py')
     logger.info('START - Train model')
 

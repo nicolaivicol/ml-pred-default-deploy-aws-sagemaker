@@ -7,6 +7,14 @@ import logging
 
 
 def run_pipeline():
+    """
+    Run the full pipeline which includes: \n
+    - feature selection
+    - hyper-parameters tuning via CV
+    - cross-validation with best parameters to estimate model's performance
+    - train model with best parameters
+    - predict on data provided locally
+    """
     logger = logging.getLogger('run_pipeline.py')
     logger.info('START - Run pipeline')
     select_feats()

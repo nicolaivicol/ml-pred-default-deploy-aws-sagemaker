@@ -11,6 +11,7 @@ from etl import load_train_test_data
 
 
 def tune_hyper_params():
+    """Search for best hyper-parameters via randomized grid search using stratified k-fold validation"""
     logger = logging.getLogger('tune_hyper_params.py')
     logger.info('START - Tune hyper-parameters')
     logger.debug(

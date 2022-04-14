@@ -10,6 +10,7 @@ from etl import load_train_test_data
 
 
 def cv():
+    """Run cross-validation with best parameters to estimate model performance out-of-sample"""
     logger = logging.getLogger('cv.py')
     logger.info('START - Cross-validation')
 
