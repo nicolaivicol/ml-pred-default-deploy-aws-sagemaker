@@ -85,7 +85,8 @@ MAP_ENC_CAT = {
 # Target & features
 # ******************************************************************************
 TARGET_NAME = 'default'
-FEAT_NAMES_ORIG = [f for f in MAP_DATA_COLS_TYPES.keys() if f not in [TARGET_NAME, 'uuid']]
+ID_NAME = 'uuid'
+FEAT_NAMES_ORIG = [f for f in MAP_DATA_COLS_TYPES.keys() if f not in [TARGET_NAME, ID_NAME]]
 FEAT_NAMES_ENG = []  # names of additional engineered features (derived the from initial features)
 FEAT_NAMES = FEAT_NAMES_ORIG + FEAT_NAMES_ENG
 
@@ -162,6 +163,14 @@ TUNE_PARAMS_GRID = {
 # - artifacts:
 FILE_TUNE_PARAMS_BEST = f'{DIR_ARTIFACTS}/tune_params_best.json'
 FILE_TUNE_ALL_PARAMS_COMBS = f'{DIR_ARTIFACTS}/tune_all_params_combs.csv'
+
+# Prediction
+# ******************************************************************************
+PRED_TARGET_NAME = 'pd'
+PRED_ID_NAME = 'uuid'
+FILE_DATA_TO_PREDICT = f'{DIR_DATA}/dataset.csv'
+# - artifact:
+FILE_PRED = f'{DIR_ARTIFACTS}/pred-[TIMESTAMP].csv'
 
 # Logging
 # ******************************************************************************
