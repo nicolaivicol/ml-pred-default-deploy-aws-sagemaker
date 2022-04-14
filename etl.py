@@ -5,7 +5,7 @@ from typing import Tuple
 from sklearn.model_selection import train_test_split
 
 import config
-from config import MAP_DATA_COLS_TYPES, MAP_ENC_CAT, FILE_DATA, TARGET_NAME
+from config import MAP_DATA_COLS_TYPES, MAP_ENC_CAT, FILE_DATA, TARGET_NAME, ID_NAME
 
 cols_numeric = [k for k, v in MAP_DATA_COLS_TYPES.items() if v == 'numeric']
 cols_boolean = [k for k, v in MAP_DATA_COLS_TYPES.items() if v in ['boolean']]
@@ -47,6 +47,8 @@ def transform_input_df(df, enable_categorical=False) -> pd.DataFrame:
 
     # convert categorical columns with int values to int and sub NA values with 0
     for col in cols_categorical_int:
+        if col == TARGET_NAME:
+            continue
         df.loc[df[col].isna(), col] = 0
         df[col] = df[col].astype(int)
 
@@ -75,10 +77,12 @@ def load_transform_data(file_data=None, filter_na_target=False, enable_categoric
     """
     df = load_raw_data(file_data)
     df = transform_input_df(df, enable_categorical=enable_categorical)
-    if filter_na_target:
-        return df.loc[df[TARGET_NAME].isna(),]  # portion of data with unknown target
-    else:
-        return df.loc[~df[TARGET_NAME].isna(),]
+    if TARGET_NAME in df.columns.to_list():
+        if filter_na_target:
+            df = df.loc[df[TARGET_NAME].isna(),]  # portion of data with unknown target which we want to predict
+        else:
+            df = df.loc[~df[TARGET_NAME].isna(),]
+    return df
 
 
 def load_train_test_data(selected_feats_only=False) -> Tuple[pd.DataFrame, pd.DataFrame, pd.array, pd.array]:
@@ -107,3 +111,13 @@ def load_full_train_data() -> Tuple[pd.DataFrame, pd.array]:
     feat_names = config.get_feat_names()
     X_train, y_train = df[feat_names], df[config.TARGET_NAME]
     return X_train, y_train
+
+
+def load_predict_data() -> Tuple[pd.DataFrame, pd.array]:
+    """
+    Load data for prediction
+    :return: data frame
+    """
+    df = load_transform_data(filter_na_target=True)
+    feat_names = config.get_feat_names()
+    return df[feat_names], df[ID_NAME]
