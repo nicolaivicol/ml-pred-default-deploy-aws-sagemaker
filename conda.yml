@@ -18,6 +18,8 @@ dependencies:
   - jupyter
   - ipynb-py-convert
   - nbconvert=5.6.1
+  - jupyter_contrib_nbextensions
+  - jupyter_nbextensions_configurator
   - streamlit
   - xgboost
   - pip:

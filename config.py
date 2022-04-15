@@ -109,12 +109,13 @@ FILE_SLCT_FEATS_RES_BORUTA = f'{DIR_ARTIFACTS}/selected_feats_res_boruta.csv'
 
 # Cross-validation
 # ******************************************************************************
-CV_N_SPLITS = 10
+CV_N_SPLITS = 16
 CV_METRIC = 'roc_auc'
 CV_RANDOM_STATE = None
 # - artifacts:
 FILE_CV_METRICS = f'{DIR_ARTIFACTS}/cv_metrics.csv'
 FILE_CV_FEAT_IMP = f'{DIR_ARTIFACTS}/cv_feat_imp.csv'
+FILE_TEST_METRICS = f'{DIR_ARTIFACTS}/test_metrics.csv'
 
 # Train model
 # ******************************************************************************
