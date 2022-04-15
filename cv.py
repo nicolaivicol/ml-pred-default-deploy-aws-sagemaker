@@ -2,6 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 import logging
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold, cross_validate
 from xgboost import XGBClassifier
 
@@ -52,6 +53,12 @@ def cv():
     df_feat_imp = pd.concat(l_feat_imp)
     df_scores = pd.DataFrame({'train_score': cv['train_score'], 'test_score': cv['test_score']})
 
+    # train model on train data and evaluate on test data (the portion not involved in CV)
+    model = XGBClassifier(**params_model)
+    model.fit(X_train, y_train)
+    y_pred_prob_test = model.predict_proba(X_test)[:, 1]
+    score_test = roc_auc_score(y_test, y_pred_prob_test)
+
     avg_train, std_train = np.mean(cv['train_score']), np.std(cv['train_score'])
     avg_test, std_test = np.mean(cv['test_score']), np.std(cv['test_score'])
     metric_ = config.CV_METRIC.upper()
@@ -59,6 +66,7 @@ def cv():
         f'Metrics: \n'
         f' - train: avg {metric_} = {avg_train:.3f} (std {metric_} = {std_train:.3f})\n'
         f' - valid: avg {metric_} = {avg_test:.3f} (std {metric_} = {std_test:.3f})\n'
+        f' - test: {metric_} = {score_test:.3f}'
     )
 
     logger.info(
@@ -69,6 +77,7 @@ def cv():
     config.make_dir_for_artifacts()
     df_scores.to_csv(config.FILE_CV_METRICS, index=False, float_format='%.3f')
     df_feat_imp.to_csv(config.FILE_CV_FEAT_IMP, index=False, float_format='%.3f')
+    pd.DataFrame({'test_score': [score_test]}).to_csv(config.FILE_TEST_METRICS, index=False, float_format='%.3f')
 
     logger.info('END - Cross-validation')
 
