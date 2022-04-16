@@ -1,7 +1,9 @@
+import math
 import numpy as np
 import pandas as pd
 from IPython.display import display, HTML
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import warnings
 
 
@@ -70,7 +72,7 @@ def describe_categorical_freq(x: pd.Series, name: str = None, max_show: int = 10
     return agg
 
 
-def display_descr_cat_freq(df, cols=None, skip_freq_cols=None):
+def display_descr_cat_freq(df, cols=None, skip_freq_cols=None, show_title=False):
     """
     Describe categorical columns in dataframe (counts, frequency)
     :param df: data frame
@@ -87,7 +89,11 @@ def display_descr_cat_freq(df, cols=None, skip_freq_cols=None):
     display(describe_categorical(df, cols))
     for col in cols:
         if col not in skip_freq_cols:
-            display(HTML(f'<br><b>{col}</b>'), describe_categorical_freq(df[col]))
+            if show_title:
+                display(HTML(f'<br><b>{col}</b>'))
+            # else:
+            #     display(HTML('<br>'))
+            display(describe_categorical_freq(df[col]))
 
 
 def set_display_options():
@@ -199,7 +205,8 @@ def agg_target_by_cat_feat(target, feat, cat_min_size=0.0, include_nan=True):
 
 def plot_agg_target_by_feat(y_agg, x_labels, bins_size=None, y_agg_full=None,
                             name_target='Target', name_agg_func='avg', name_labels='Feature',
-                            name_bins='bin', y2_range=None, is_first_nan=False):
+                            name_bins='bin', y2_range=None, is_first_nan=False,
+                            fig=None, row=None, col=None, nr_subplot=None):
     """
     Plot aggregated target variable by a feature variable (numeric or categorical)
     :param y_agg: Aggregated value of target by bin/category.
@@ -215,29 +222,26 @@ def plot_agg_target_by_feat(y_agg, x_labels, bins_size=None, y_agg_full=None,
     :return: plotly object
     """
 
-    fig = go.Figure()
+    if fig is None:
+        fig = go.Figure()
+
     # add histogram bars on y-axis on the left
     if bins_size is None:
         bins_size = [np.nan] * len(x_labels)
+    colors_ = ['grey' for i in x_labels]
+    if is_first_nan:
+        colors_[0] = 'orangered'
     fig.add_trace(
         go.Bar(x=x_labels,
                y=np.round(bins_size, 3),
                name='histogram',
                opacity=0.4,
-               marker_color='grey',
-               yaxis='y')
+               marker=dict(color=colors_),
+               # marker_color='grey',
+               yaxis='y'),
+        row=row,
+        col=col,
     )
-    # add annotation on top of first bar to indicate that this bar is for NaN values
-    if is_first_nan:
-        fig.add_annotation(x=x_labels[0], y=bins_size[0], text="NaN")
-        fig.update_annotations(dict(
-            xref="x",
-            yref="y",
-            showarrow=True,
-            arrowhead=5,
-            ax=0,
-            ay=-40
-        ))
     # add aggregated value of target variable per bin/category as red dot markers
     fig.add_trace(
         go.Scatter(
@@ -248,13 +252,15 @@ def plot_agg_target_by_feat(y_agg, x_labels, bins_size=None, y_agg_full=None,
             name=f'{name_agg_func} per {name_bins} (RHS)',
             marker=dict(
                 color='red',
-                size=15,
+                size=10,
                 line=dict(
                     color='white',
                     width=2
                 )
             ),
-            yaxis='y2')
+            yaxis='y2'),
+        row=row,
+        col=col,
     )
     # add the aggregated value of target value over the whole population as red line
     if y_agg_full is not None:
@@ -267,28 +273,32 @@ def plot_agg_target_by_feat(y_agg, x_labels, bins_size=None, y_agg_full=None,
                 opacity=0.7,
                 line=dict(color='red',
                           width=2),
-                yaxis='y2')
+                yaxis='y2'),
+            row=row,
+            col=col,
         )
     # titles, x-axis and y-axis names
-    fig.update_layout(
-        title=f'<b>{name_target}</b> by <b>{name_labels}</b>',
-        xaxis=dict(title=f'<b>{name_labels}</b>'),
-        yaxis=dict(title='Histogram',
-                   range=[-0.02, 1.02],
-                   showgrid=False),
-        yaxis2=dict(title=f'<b>{name_target} {name_agg_func}</b>',
-                    side='right',
-                    overlaying='y',
-                    range=y2_range),
-        height=HEIGHT_PLOT,
-        margin=dict(l=50, r=25, t=25, b=50),
-        autosize=True,
-    )
+    if row is None and col is None:
+        fig.update_layout(
+            title=f'<b>{name_target}</b> by <b>{name_labels}</b>',
+            xaxis=dict(title=f'<b>{name_labels}</b>'),
+            yaxis=dict(title='Histogram',
+                       range=[-0.02, 1.02],
+                       showgrid=False),
+            yaxis2=dict(title=f'<b>{name_target} {name_agg_func}</b>',
+                        side='right',
+                        overlaying='y',
+                        range=y2_range),
+            height=HEIGHT_PLOT,
+            margin=dict(l=50, r=25, t=25, b=50),
+            autosize=True,
+        )
+
     return fig
 
 
 def plot_agg_target_by_feat_env(d, name_feat, type_feat='num', target_name='default',
-                                y2_range=None, min_size=0.0025, show_legend=True):
+                                y2_range=None, min_size=0.0025, show_legend=True, fig=None, row=None, col=None, nr_subplot=None):
     """
     Envelope on function plot_agg_target_by_feat
     :param d: data frame
@@ -341,7 +351,40 @@ def plot_agg_target_by_feat_env(d, name_feat, type_feat='num', target_name='defa
         name_labels=name_feat,
         name_bins=name_bins,
         y2_range=y2_range,
-        is_first_nan=is_first_nan)
+        is_first_nan=is_first_nan,
+        fig=fig,
+        row=row,
+        col=col,
+        nr_subplot=nr_subplot,
+    )
 
     fig.update_layout(showlegend=show_legend)
     return fig
+
+
+def plot_many_agg_target_by_feat(d, names_feat, type_feat='num', target_name='default',
+                                 y2_range=None, min_size=0.0025, show_legend=False, rows=None, cols=None):
+
+    if cols is None:
+        cols = 2
+    if rows is None:
+        rows = math.ceil(len(names_feat)/cols)
+
+    fig = make_subplots(rows=rows, cols=cols, shared_xaxes=False, shared_yaxes=True)
+
+    for i, name_feat in enumerate(names_feat):
+        row = math.ceil((i + 1) / cols)
+        col = (i + 1) - (row - 1) * cols
+        fig = plot_agg_target_by_feat_env(d, name_feat, type_feat, target_name, y2_range, min_size, show_legend, fig, row, col, i+1)
+
+    fig.update_layout(
+        title="Default rate by feature & feature histogram",
+        height=300*rows,
+        margin=dict(l=30, r=30, t=50, b=50),
+        autosize=True,
+    )
+
+    fig.update_layout({f'xaxis{i + 1}': {'title': name_feat} for i, name_feat in enumerate(names_feat)})
+
+    return fig
+
