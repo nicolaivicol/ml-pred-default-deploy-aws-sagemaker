@@ -173,6 +173,12 @@ FILE_DATA_TO_PREDICT = f'{DIR_DATA}/dataset.csv'
 # - artifact:
 FILE_PRED = f'{DIR_ARTIFACTS}/pred-[TIMESTAMP].csv'
 
+# Deployment
+# ******************************************************************************
+# https://us-east-1.console.aws.amazon.com/iamv2/home?region=us-east-1#/roles
+AWS_SAGEMAKER_ROLE_ARN = 'arn:aws:iam::323062068303:role/service-role/AmazonSageMaker-ExecutionRole-20220411T215390'
+AWS_SAGEMAKER_ENDPOINT_MODEL = 'klrn-model-xgb-ep-2022-04-17-20-59-14'
+
 # Logging
 # ******************************************************************************
 LOGS_LEVEL = logging.DEBUG
