@@ -44,7 +44,7 @@ from IPython.display import display
 DIR_PROJ = 'klrn'
 if DIR_PROJ in os.getcwd().split('/'):
     while os.getcwd().split(os.path.sep)[-1] != DIR_PROJ:
-        os.chdir('')
+        os.chdir('..')
     DIR_PROJ = os.getcwd()
     # print(f"working dir: {os.getcwd()}")
 else:
@@ -237,11 +237,11 @@ I have decided to use the **XGBoost** library.
 That's because XGBoost integrates better with AWS (documented on aws site) and 
 I want to deploy the model later via AWS SageMaker.     
 **Metric**     
-I have decide to use the **AUC** metric (AUC under the ROC curve) for this classification task.    
+I have decide to use the **AUC** under the ROC curve as the metric to maximize for this classification task.    
 This metric suits well the case of imbalanced data and it is commonly used for classification.    
 I have also tried the AUC under the precision-recall curve, 
 which is theoretically better than AUC under ROC for highly imbalanced data, 
-but I got unstable results, so I decided to give it up and use the classical AUC.
+but I got unstable results, so I decided to give it up and use the 'classical' AUC (under ROC).
 '''
 
 # %%
@@ -410,7 +410,7 @@ print(_)
 
 ### Configs
 The configuration of the entire pipeline is stored in `config.py`.          
-This config file stores all the parameters regarding:      
+This config file stores all the parameters regarding: 
 data & artifacts file paths, each step of the pipeline, like feat selection, cv, etc.
 
 ### ETL & Features Engineering
@@ -423,11 +423,11 @@ ETA < 10 min
 
 ### Tune hyper-parameters via CV
 Run script `tune_hyper_params.py` or `tune_hyper_params()` from it.     
-ETA = 20-30 min (long because it runs train & predict many times: 200 params combination x 4 folds)  
+ETA = 20-30 min (long because it runs train & predict many times: 250 parameters combination x 4 folds)  
 
 ### Estimate model performance via CV
 Run script `cv.py` or `cv()` from it.    
-ETA < 5 min (fast because it runs k=16 folds only for one combination of hyper-prameters, the best found in tuning)
+ETA < 5 min (fast because it runs k=16 folds only for one combination of hyper-parameters, the best found in tuning)
 
 ### Train model
 Run script `train.py` or `train()` from it.      
@@ -457,7 +457,7 @@ The pipeline includes:
     * `jupyter nbconvert --ExecutePreprocessor.timeout=600 --to notebook --inplace --execute artifacts/solution_report.ipynb`
 * If the above fails, start jupyter and execute the entire notebook:
     * `jupyter notebook`
-* Download as html with TOC and hidden code:
+* Download the notebook as html with TOC and hidden code:
     * `jupyter nbconvert artifacts/solution_report.ipynb --to=html_toc --TemplateExporter.exclude_input=True`
 '''
 
