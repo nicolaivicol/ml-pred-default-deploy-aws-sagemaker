@@ -453,10 +453,10 @@ The pipeline includes:
     * `conda activate klrn-hw`
 * Convert .py file to .ipynb notebook:
     * `ipynb-py-convert solution_report.py artifacts/solution_report.ipynb`
-* Start jupyter:
-    * `jupyter notebook`
 * Run all cells:
     * `jupyter nbconvert --ExecutePreprocessor.timeout=600 --to notebook --inplace --execute artifacts/solution_report.ipynb`
+* If the above fails, start jupyter and execute the entire notebook:
+    * `jupyter notebook`
 * Download as html with TOC and hidden code:
     * `jupyter nbconvert artifacts/solution_report.ipynb --to=html_toc --TemplateExporter.exclude_input=True`
 '''
