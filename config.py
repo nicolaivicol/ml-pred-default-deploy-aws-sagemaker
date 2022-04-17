@@ -145,8 +145,8 @@ FILE_MODEL_FEAT_IMP = f'{DIR_ARTIFACTS}/model_feat_imp.csv'
 
 # Tuning/search of hyper parameter using randomized grid search & stratified k-fold CV
 # ******************************************************************************
-TUNE_N_ITER = 5  # number of candidate combinations of parameters to try (aka iterations)
-TUNE_N_SPLITS = 3  # number of splits in k-fold validation for each combination of parameters (iteration)
+TUNE_N_ITER = 250  # number of candidate combinations of parameters to try (aka iterations)
+TUNE_N_SPLITS = 4  # number of splits in k-fold validation for each combination of parameters (iteration)
 TUNE_SCORING = 'roc_auc'
 TUNE_RANDOM_STATE = None  # random each time
 # parameters grid to search:

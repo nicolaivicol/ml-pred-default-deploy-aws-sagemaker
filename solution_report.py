@@ -19,11 +19,12 @@
     - [Categorical Columns](#categorical_columns)    
 - [Plot default rate by main categorical features](#plot_by_cat_feats)
 - [Plot default rate by main numeric features](#plot_by_num_feats)
+- [Choice of Model & Metric](#choice)
 - [Features Engineering](#features_engineering)
 - [Features Selection](#features_selection)
 - [Hyper-parameters Tuning](#hyper_parameters_tuning)
 - [Model performance](#model_performance)
-- [Pipeline: steps & instructions](#)
+- [Pipeline: steps & instructions](#pipeline)
 '''
 
 # %%
@@ -66,8 +67,22 @@ set_display_options()
 '''
 <a id="tldr"></a> 
 ## TLDR
-* sss
-* sdd
+* binary classification task
+* highly imbalanced target (few positives, only 1.43%)
+* data has ~100K rows, 41 features, 10K values of the target are missing and have to be predicted
+* a single XGBoost model was used for modeling and prediction
+* 30% of data was left untouched as test data, it was not used for CV, feat selection, params tuning
+* minimal feature engineering:
+    * categorical features were numerically encoded (cap to most frequent 12 categories)
+    * boolean as int
+    * NA values replaced with 0 in categorical features and -1 in numeric features
+* feature selection performed with boruta: 26 features selected out of 41
+* hyper-parameter tuning performed via randomized grid search using stratified CV (250 iterations, 4 folds)
+* folds were drawn randomly on the 'uuid' column
+* AUC=0.912 (with std.dev=0.013), based on CV of the model with optimal hyper-parameters
+* AUC=0.905 for the test data (30%)
+* expecting AUC on the evaluation data (10K rows) to be around AUC=0.912 +/- 0.013
+* the pipeline is organized as python scripts/modules and it can run end-to-end without human intervention
 '''
 
 # %%
@@ -212,15 +227,21 @@ py.iplot(fig)
 '''
 <a id="choice"></a>  
 ## Choice of Model & Metric
+**Model**     
 I have decided to use a GBM model for this task.     
 That's because this type of model deals well with nonlinearities and interactions 
 between features and requires minimal or no feature engineering.    
-Also these models perform well on tabular data and on volumes of data in the order of 100K rows.   
-Among the usual cadidates: LightGBM, XGBoost and CatBoost, I have decide to use the **XGBoost** library.     
-That's because it integrates better with AWS and I want to deploy it later to AWS SageMaker.
-
-I have decide to use the **AUC** metric (describing the ROC curve) for this classification task.    
-This metric suits better the case of imbalanced data.
+Usually, the GBM models perform well for classisication tasks on tabular data of good sizes (~100K).   
+Among the usual cadidate libraries: LightGBM, XGBoost and CatBoost, 
+I have decided to use the **XGBoost** library.     
+That's because XGBoost integrates better with AWS (documented on aws site) and 
+I want to deploy the model later via AWS SageMaker.     
+**Metric**     
+I have decide to use the **AUC** metric (AUC under the ROC curve) for this classification task.    
+This metric suits well the case of imbalanced data and it is commonly used for classification.    
+I have also tried the AUC under the precision-recall curve, 
+which is theoretically better than AUC under ROC for highly imbalanced data, 
+but I got unstable results, so I decided to give it up and use the classical AUC.
 '''
 
 # %%
@@ -228,13 +249,16 @@ This metric suits better the case of imbalanced data.
 <a id="features_engineering"></a>  
 ## Features Engineering
 
-The GBM model (XGBoost) that is used in this solution, deals well with raw features, with their nonlinearities and interactions.     
-The model is also scale invariant to features. In other words, the features engineering can be minimal.     
-The only requiremnt is to have a dense matrix, i.e. replace NA values with non-NA values.    
+The GBM model (XGBoost) that is used in this solution, deals well with raw 
+features, with their nonlinearities and interactions.     
+The model is not sensitive to features scale.     
+In other words, the features engineering can be minimal.     
+The only requirement in the case of XGBoost is to have a dense matrix, which 
+means replacing NA values with non-NA values encoding categorical features to numeric.
 
 In the end, only the following transformation were performed to the raw features:
 * replace NA values with 0 in the categorical features (those having integer values)
-* text categorical features were encoded using a simple numeric (ordinal) encoding, but only the first 10 most frequent were kept, all other values fall under a common miscellaneous category.
+* text categorical features were encoded using a simple numeric (ordinal) encoding, keeping the most frequent (up to 12) categories, while all other values falling under a common miscellaneous category.
 * replace NA values with -1 in numeric features
 * convert boolean columns to numeric
 
@@ -256,7 +280,8 @@ display(df_res_feat_slct)
 
 # %%
 '''
-The features importance collected from many iterations during CV are illustrated below.
+The features importance collected from many iterations during CV are illustrated below.      
+Both the average and the standart deviation are plotted.
 '''
 
 # %%
@@ -301,7 +326,7 @@ py.iplot(fig)
 ## Hyper-parameters Tuning
 The search for best hyper-parameters was done via a randomized grid search using stratified k-fold validation.    
 For a given combination of parameters a cross-validation of k=4 folds is performed (k is small for faster iterations).
-The algorithm was allowed to run for **200** random combinations of parameters out of 2,916 possible from the following grid:
+The algorithm was allowed to run for **250** random combinations of parameters out of 2,916 possible from the following grid:
 '''
 
 # %%
@@ -331,7 +356,7 @@ display(df_res_tune.head(20))
 
 # %%
 '''
-All 200 combinations attempted in a parallel coordinates plot:
+All 250 combinations attempted in a parallel coordinates plot:
 '''
 
 # %%
@@ -375,14 +400,7 @@ print(_)
 
 # %%
 '''
-<a id="tr"></a>
-## Model performance
-'''
-
-
-# %%
-'''
-<a id="workflow_step_instructions"></a>
+<a id="pipeline"></a>
 ## Pipeline: steps & instructions
 ### Prerequisites
 * create conda environment in order to be able to run the code in this project
@@ -420,19 +438,25 @@ Later this will be loaded for prediction.
 Run script `predict.py` or `predict()` from it.
 
 ### Run pipeline entirely
-Run script `run_pipeline.py` or `run_pipeline()` from it.
+Run script `run_pipeline.py` or `run_pipeline()` from it.    
+The pipeline includes:
+* select features
+* tune hyper-parameters
+* cross-validate (to estimate the AUC out-of-sample)
+* train model and save it as artifact
+* predict and save prediction
 
 ### Generate solution report as a self-contained html file
 * Change directory to where the project is located:
     * `cd /Users/nicolaiv/work/misc/klrn`
 * Activate conda environment:
-    * conda activate klrn-hw
+    * `conda activate klrn-hw`
 * Convert .py file to .ipynb notebook:
-    *`ipynb-py-convert solution_report.py artifacts/solution_report.ipynb`
+    * `ipynb-py-convert solution_report.py artifacts/solution_report.ipynb`
 * Start jupyter:
-    *`jupyter notebook`
+    * `jupyter notebook`
 * Run all cells:
-    * jupyter nbconvert --ExecutePreprocessor.timeout=600 --to notebook --inplace --execute artifacts/solution_report.ipynb
+    * `jupyter nbconvert --ExecutePreprocessor.timeout=600 --to notebook --inplace --execute artifacts/solution_report.ipynb`
 * Download as html with TOC and hidden code:
     * `jupyter nbconvert artifacts/solution_report.ipynb --to=html_toc --TemplateExporter.exclude_input=True`
 '''
