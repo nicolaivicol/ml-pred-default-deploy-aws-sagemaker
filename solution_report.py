@@ -25,6 +25,10 @@
 - [Hyper-parameters Tuning](#hyper_parameters_tuning)
 - [Model performance](#model_performance)
 - [Pipeline: steps & instructions](#pipeline)
+- [Deploy model on AWS](#deploy)
+    - [Invoke from Sagemaker endpoint](#sagemaker)
+    - [Invoke from public API](#api)
+- [Prediction on evaluation data](#prediction)
 '''
 
 # %%
@@ -38,7 +42,7 @@ import plotly.graph_objects as go
 import plotly.offline as py
 import plotly.express as px
 # from plotly.subplots import make_subplots
-from IPython.display import display
+from IPython.display import display, Image
 
 # cd at project's root folder to load modules
 DIR_PROJ = 'klrn'
@@ -83,6 +87,7 @@ set_display_options()
 * AUC=0.905 for the test data (30%)
 * expecting AUC on the evaluation data (10K rows) to be around AUC=0.912 +/- 0.013
 * the pipeline is organized as python scripts/modules and it can run end-to-end without human intervention
+* model was also deployed on AWS - it is accessible publicly after being exposed via a an API which runs a lambda function which calls the sagemaker endpoint
 '''
 
 # %%
@@ -437,7 +442,7 @@ Later this will be loaded for prediction.
 ### Predict
 Run script `predict.py` or `predict()` from it.
 
-### Run pipeline entirely
+### Run entire pipeline locally
 Run script `run_pipeline.py` or `run_pipeline()` from it.    
 The pipeline includes:
 * select features
@@ -459,6 +464,60 @@ The pipeline includes:
     * `jupyter notebook`
 * Download the notebook as html with TOC and hidden code:
     * `jupyter nbconvert artifacts/solution_report.ipynb --to=html_toc --TemplateExporter.exclude_input=True`
+'''
+
+# %%
+'''
+<a id="deploy"></a><a id="sagemaker"></a>
+## Deploy model on AWS
+### Deploy model to AWS SageMaker
+The model was first deployed to AWS Sagemaker.     
+That's how it appears in the AWS console (status=InService):    
+'''
+
+# %%
+Image(url='https://drive.google.com/uc?export=view&id=1UNWdVwvNRuiUnnOYadYsk-J5VAvjqGU8', width=1000, height=300)
+
+# %%
+'''
+The endpoint support two types of inputs: `application/json` and `text/csv`.        
+See how the model can be invoked in the unit tests from `test/test_invoke_aws_sagemaker.py`.      
+The tests check whether the local prediction is equal to the prediction by the model in Sagemaker.     
+Both tests pass successfully.
+'''
+
+'''
+<a id="api"></a>
+### Expose model via public API
+However, the Sagemaker endpoint is accesible privately only to my aws account.       
+To expose the model publicly I had to create an API in AWS API Gateway, 
+which triggers a Lambda function that invokes the Sagemaker endpoint.      
+This design of the solution looks like in the figure below:
+'''
+
+# %%
+Image(url='https://d2908q01vomqb2.cloudfront.net/f1f836cb4ea6efb2a0b1b99f41ad8b103eff4b59/2021/03/31/1-diagram.jpg',
+      width=1000, height=300)
+
+# %%
+'''
+You can see in `test/test_api.py` how the model can be invoked from the API endpoint using python.       
+It produces the same predictions as the local model.      
+The model is accesible at this URL: `https://oebt4deu50.execute-api.us-east-1.amazonaws.com/test/predict`.     
+It can be invoked also manually using Postman. The body of the request has to be a json with a csv-like string.       
+Here is an example of a body:     
+`{"data":"0.0,0.0,0.0,1,1,1,0,20.0,12.69,4,1,31638.0,31638.0,8,0.1538,2.0,0.0,13.0,14.0,2.0,1,1,1,1,1,0.0,1\n0.0,0.0,-1.0,1,1,1,1,50.0,25.833,1,1,13749.0,13749.0,2,0.0,0.0,0.0,9.0,19.0,0.0,1,1,1,2,2,0.0,0"}`     
+See a screenshot of how I did it:
+'''
+
+# %%
+Image(url='https://drive.google.com/uc?export=view&id=1EDHYKtOiGVPGX9DFBUWyAUcxTOoIRm-1', width=1000, height=300)
+
+# %%
+'''
+<a id="prediction"></a>
+## Prediction on evaluation data
+Please find the prediction on evaluatin data here in the artifacts folder: 'klrn/artifacts/pred-20220418030401.csv'
 '''
 
 # %%

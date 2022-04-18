@@ -178,6 +178,9 @@ FILE_PRED = f'{DIR_ARTIFACTS}/pred-[TIMESTAMP].csv'
 # https://us-east-1.console.aws.amazon.com/iamv2/home?region=us-east-1#/roles
 AWS_SAGEMAKER_ROLE_ARN = 'arn:aws:iam::323062068303:role/service-role/AmazonSageMaker-ExecutionRole-20220411T215390'
 AWS_SAGEMAKER_ENDPOINT_MODEL = 'klrn-model-xgb-ep-2022-04-17-20-59-14'
+AWS_API_URL_RESOURCE = 'https://oebt4deu50.execute-api.us-east-1.amazonaws.com/test/predict'
+API_KEY_ID = 'mbqezubbtf'
+API_KEY_VALUE = 'NN8EmHxaUC5PHWE5emTnw20iYACyHRaB6LqEIl65'
 
 # Logging
 # ******************************************************************************
