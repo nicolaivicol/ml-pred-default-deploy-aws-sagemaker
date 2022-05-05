@@ -22,6 +22,7 @@ dependencies:
   - jupyter_nbextensions_configurator
   - streamlit
   - boruta_py
+  - optuna
   - pip:
     - scikit-learn==1.0
     - sagemaker
