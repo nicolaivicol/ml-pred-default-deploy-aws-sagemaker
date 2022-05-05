@@ -1,6 +1,6 @@
 # %%
 '''
-<b><font size="+3">Solution report: Klarna Interview Homework</font></b><br><br>
+<b><font size="+3">Solution Report: Modelling and prediction of default</font></b><br><br>
 <font size="+1">Nicolai Vicol (<a href="mailto:nicolaivicol@gmail.com">nicolaivicol@gmail.com</a>)</font><br>
 <font size="+1">2022-04-15</font>
 '''
@@ -329,9 +329,9 @@ py.iplot(fig)
 '''
 <a id="hyper_parameters_tuning"></a>
 ## Hyper-parameters Tuning
-The search for best hyper-parameters was done via a randomized grid search using stratified k-fold validation.    
+The search for best hyper-parameters was done using using stratified k-fold validation.    
 For a given combination of parameters a cross-validation of k=4 folds is performed (k is small for faster iterations).
-The algorithm was allowed to run for **250** random combinations of parameters out of 2,916 possible from the following grid:
+The algorithm was allowed to run for **100** combinations of parameters out of 2,916 possible from the following grid:
 '''
 
 # %%
@@ -354,14 +354,16 @@ Top 20 combinations of parameters:
 
 # %%
 df_res_tune = pd.read_csv(config.FILE_TUNE_ALL_PARAMS_COMBS)
-cols_show = ['mean_test_score', 'std_test_score'] + [f'param_{p}' for p in config.TUNE_PARAMS_GRID.keys()]
-df_res_tune = df_res_tune[cols_show]
 df_res_tune.columns = [f.replace('param_', '') for f in df_res_tune.columns]
+cols_show = ['mean_test_score', 'std_test_score'] + list(config.TUNE_PARAMS_GRID.keys())
+cols_show = [c for c in cols_show if c in df_res_tune.columns]
+df_res_tune = df_res_tune[cols_show]
+
 display(df_res_tune.head(20))
 
 # %%
 '''
-All 250 combinations attempted in a parallel coordinates plot:
+All attempted combinations in a parallel coordinates plot:
 '''
 
 # %%
