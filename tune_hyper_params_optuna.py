@@ -64,12 +64,12 @@ def tune_hyper_params_w_optuna():
 
     logger.info(
         f'Save artifacts: \n'
-        f' - CV results to: {config.FILE_TUNE_ALL_PARAMS_COMBS_OPTUNA} \n'
-        f' - Best params to: {config.FILE_TUNE_PARAMS_BEST_OPTUNA}'
+        f' - CV results to: {config.FILE_TUNE_ALL_PARAMS_COMBS} \n'
+        f' - Best params to: {config.FILE_TUNE_PARAMS_BEST}'
     )
     config.make_dir_for_artifacts()
-    df_cv_results.to_csv(config.FILE_TUNE_ALL_PARAMS_COMBS_OPTUNA, index=False, float_format='%.4f')
-    with open(config.FILE_TUNE_PARAMS_BEST_OPTUNA, 'w') as f:
+    df_cv_results.to_csv(config.FILE_TUNE_ALL_PARAMS_COMBS, index=False, float_format='%.4f')
+    with open(config.FILE_TUNE_PARAMS_BEST, 'w') as f:
         json.dump(study.best_params, f, indent=2)
     logger.info('END - Tune hyper-parameters')
 
@@ -77,7 +77,7 @@ def tune_hyper_params_w_optuna():
 def plot_parallel_optuna_res():
     import plotly.offline as py
     import plotly.express as px
-    df_res_tune = pd.read_csv(config.FILE_TUNE_ALL_PARAMS_COMBS_OPTUNA)
+    df_res_tune = pd.read_csv(config.FILE_TUNE_ALL_PARAMS_COMBS)
     fig = px.parallel_coordinates(
         df_res_tune,
         color='mean_test_score',

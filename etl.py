@@ -14,6 +14,15 @@ cols_categorical_text = ['merchant_category', 'merchant_group', 'name_in_email']
 cols_categorical_int = [c for c in cols_categorical if c not in (cols_categorical_text + cols_boolean)]
 
 
+def extract_raw_data_from_db():
+    """
+    Extract data from data base or s3 and save to disk.
+    TODO: implement
+    :return:
+    """
+    pass
+
+
 def load_raw_data(file_data=None) -> pd.DataFrame:
     """
     Load raw data from csv file

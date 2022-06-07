@@ -162,8 +162,8 @@ TUNE_PARAMS_GRID = {
     'scale_pos_weight': [1, 10, 70, 100],
 }
 # - artifacts:
-FILE_TUNE_PARAMS_BEST = f'{DIR_ARTIFACTS}/tune_params_best.json'
-FILE_TUNE_ALL_PARAMS_COMBS = f'{DIR_ARTIFACTS}/tune_all_params_combs.csv'
+FILE_TUNE_PARAMS_BEST = f'{DIR_ARTIFACTS}/tune_params_best_optuna.json'
+FILE_TUNE_ALL_PARAMS_COMBS = f'{DIR_ARTIFACTS}/tune_all_params_combs_optuna.csv'
 
 # Prediction
 # ******************************************************************************

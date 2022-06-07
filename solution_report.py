@@ -25,6 +25,7 @@
 - [Hyper-parameters Tuning](#hyper_parameters_tuning)
 - [Model performance](#model_performance)
 - [Pipeline: steps & instructions](#pipeline)
+- [Run pipeline in Airflow](#airflow)
 - [Deploy model on AWS](#deploy)
     - [Invoke from Sagemaker endpoint](#sagemaker)
     - [Invoke from public API](#api)
@@ -447,6 +448,7 @@ Run script `predict.py` or `predict()` from it.
 ### Run entire pipeline locally
 Run script `run_pipeline.py` or `run_pipeline()` from it.    
 The pipeline includes:
+* load data
 * select features
 * tune hyper-parameters
 * cross-validate (to estimate the AUC out-of-sample)
@@ -467,6 +469,16 @@ The pipeline includes:
 * Download the notebook as html with TOC and hidden code:
     * `jupyter nbconvert artifacts/solution_report.ipynb --to=html_toc --TemplateExporter.exclude_input=True`
 '''
+
+# %%
+'''
+<a id="airflow"></a><a id="airflow"></a>
+## Run pipeline in Airflow
+### Example of DAG
+'''
+
+# %%
+Image(url='https://valohai.com/blog/scaling-airflow-machine-learning/airflow-valohai-operator-article-2.png', width=1000, height=300)
 
 # %%
 '''
