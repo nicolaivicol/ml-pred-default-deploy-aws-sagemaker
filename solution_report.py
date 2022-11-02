@@ -430,7 +430,7 @@ Run script `select_feats.py` or `select_feats()` from it.
 ETA < 10 min    
 
 ### Tune hyper-parameters via CV
-Run script `tune_hyper_params.py` or `tune_hyper_params()` from it.     
+Run script `tune_hyper_params_rand.py` or `tune_hyper_params()` from it.     
 ETA = 20-30 min (long because it runs train & predict many times: 250 parameters combination x 4 folds)  
 
 ### Estimate model performance via CV
@@ -531,7 +531,7 @@ Image(url='https://drive.google.com/uc?export=view&id=1EDHYKtOiGVPGX9DFBUWyAUcxT
 '''
 <a id="prediction"></a>
 ## Prediction on evaluation data
-Please find the prediction on evaluatin data here in the artifacts folder: 'klrn/artifacts/pred-20220418030401.csv'
+Please find the prediction on evaluation data here in the artifacts folder: 'klrn/artifacts/pred-20220418030401.csv'
 '''
 
 # %%

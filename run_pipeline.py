@@ -1,6 +1,6 @@
 from etl import extract_raw_data_from_db
 from select_feats import select_feats
-from tune_hyper_params import tune_hyper_params
+from tune_hyper_params_rand import tune_hyper_params
 from tune_hyper_params_optuna import tune_hyper_params_w_optuna
 from cv import cv
 from train import train
