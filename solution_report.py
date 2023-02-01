@@ -46,7 +46,7 @@ import plotly.express as px
 from IPython.display import display, Image
 
 # cd at project's root folder to load modules
-DIR_PROJ = 'klrn'
+DIR_PROJ = 'ml-pred-default-deploy-aws-sagemaker'
 if DIR_PROJ in os.getcwd().split('/'):
     while os.getcwd().split(os.path.sep)[-1] != DIR_PROJ:
         os.chdir('..')
@@ -132,7 +132,7 @@ print(f"Default rate: {round(df.loc[~target_is_na, config.TARGET_NAME].mean()*10
 ### Obs 2: Train/Evaluation Split
 There are **10,000** NA values in the target column 'default' (**10%** out the total sample of 99,976 rows).    
 These are the values the candidates needs to predict.    
-This prediction will be used by Klarna interviewers to evaluate the model on unseen data.      
+This prediction will be used to evaluate the model on unseen data.      
 The train and evaluate data are disjoint sets by uuid (user ID) with a proportion of **90%/10%** respectively (89,976 / 10,000 users).    
 The evaluation set was drawn randomly by uuid.    
 Hence, the cross-validation should also be performed on folds drawn randomly by uuid and train/validate splits seprated by uuid.    
@@ -412,7 +412,7 @@ print(_)
 ## Pipeline: steps & instructions
 ### Prerequisites
 * create conda environment in order to be able to run the code in this project
-    * `cd klrn` (change directory to where the project is located)
+    * `cd ml-pred-default-deploy-aws-sagemaker` (change directory to where the project is located)
     * `conda env create -f conda.yml`
     * `conda activate klrn-hw`
 
@@ -457,7 +457,7 @@ The pipeline includes:
 
 ### Generate solution report as a self-contained html file
 * Change directory to where the project is located:
-    * `cd /Users/nicolaiv/work/misc/klrn`
+    * `cd ./ml-pred-default-deploy-aws-sagemaker`
 * Activate conda environment:
     * `conda activate klrn-hw`
 * Convert .py file to .ipynb notebook:
@@ -531,7 +531,7 @@ Image(url='https://drive.google.com/uc?export=view&id=1EDHYKtOiGVPGX9DFBUWyAUcxT
 '''
 <a id="prediction"></a>
 ## Prediction on evaluation data
-Please find the prediction on evaluation data here in the artifacts folder: 'klrn/artifacts/pred-20220418030401.csv'
+Please find the prediction on evaluation data here in the artifacts folder: './artifacts/pred-20220418030401.csv'
 '''
 
 # %%
