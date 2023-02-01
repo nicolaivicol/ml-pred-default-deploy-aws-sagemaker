@@ -3,6 +3,7 @@
 .pytest_cache
 *.log
 artifacts
+data
 
 # temp file produced by plotly
 temp-plot.html
