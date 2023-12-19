@@ -1,0 +1,23 @@
+scikit-learn
+sagemaker
+xgboost # important to have the same version as in AWS
+pandas
+numpy
+scipy
+tzlocal
+boto3
+tqdm
+more-itertools
+plotly
+tabulate
+papermill
+streamlit
+Boruta
+optuna
+notebook
+jupyter
+ipynb-py-convert
+nbconvert # =5.6.1
+matplotlib
+#  - jupyter_contrib_nbextensions
+#  - jupyter_nbextensions_configurator

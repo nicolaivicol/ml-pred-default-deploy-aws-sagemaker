@@ -1,4 +1,6 @@
 # this has utils to load, transform data prior to feed to the model
+import os
+import boto3
 import numpy as np
 import pandas as pd
 from typing import Tuple
@@ -6,6 +8,8 @@ from sklearn.model_selection import train_test_split
 
 import config
 from config import MAP_DATA_COLS_TYPES, MAP_ENC_CAT, FILE_DATA, TARGET_NAME, ID_NAME
+
+import json
 
 cols_numeric = [k for k, v in MAP_DATA_COLS_TYPES.items() if v == 'numeric']
 cols_boolean = [k for k, v in MAP_DATA_COLS_TYPES.items() if v in ['boolean']]
@@ -130,3 +134,89 @@ def load_predict_data() -> Tuple[pd.DataFrame, pd.array]:
     df = load_transform_data(filter_na_target=True)
     feat_names = config.get_feat_names()
     return df[feat_names], df[ID_NAME]
+
+
+def upload_directory_to_s3(dir_local, s3_bucket, s3_folder):
+    """
+    Uploads a directory and its subdirectories to an S3 bucket.
+
+    Args:
+    local_directory (str): The local directory to upload.
+    bucket (str): The S3 bucket to upload to.
+    s3_folder (str): The S3 folder path to upload the files to.
+    """
+    # Create a boto3 client
+    s3_client = boto3.client('s3')
+
+    # Walk through the local directory
+    for root, dirs, files in os.walk(dir_local):
+        for filename in files:
+            # construct the full local path
+            local_path = os.path.join(root, filename)
+
+            # construct the full S3 path
+            relative_path = os.path.relpath(local_path, dir_local)
+            s3_path = os.path.join(s3_folder, relative_path)
+
+            # Upload the file
+            s3_client.upload_file(local_path, s3_bucket, s3_path)
+            print(f"File {local_path} uploaded to {s3_path}")
+
+
+def split_raw_data_to_train_test_pred_for_s3_catboost(test_size=0.1, random_state=42,
+                                                      folder_name='data_for_s3_catboost'):
+    """ split raw data to train/test/pred """
+    df = load_raw_data()
+
+    # keep only the target and feature columns, the target columns is first
+    df = df[[config.TARGET_NAME] + config.FEAT_NAMES]
+
+    # convert categorical columns with int values to int and sub NA values with 0
+    for col in cols_categorical_int:
+        is_na = df[col].isna()
+        df.loc[is_na, col] = 0
+        df[col] = df[col].astype(int)
+
+    # data for prediction with unknown target
+    df_pred = df.loc[df[config.TARGET_NAME].isnull(),]
+
+    # train / test split wth known target
+    df = df.loc[~df[config.TARGET_NAME].isnull(),]
+    df_train, df_test = train_test_split(
+        df,
+        test_size=test_size,
+        random_state=random_state,
+    )
+
+    dfs = {
+        'train': df_train,
+        'test': df_test,
+        'pred': df_pred,
+    }
+
+    # keep data on disk
+    for name, df in dfs.items():
+        dir_ = f'{config.DIR_DATA}/{folder_name}/{name}'
+        if not os.path.exists(dir_):
+            os.makedirs(dir_)
+
+        # save data to .csv
+        df.to_csv(f'{dir_}/data.csv', sep=',', index=False, header=False)
+
+        # save the json file with categorical column indexes, this JSON file should be formatted such that the key is
+        # 'cat_index' and value is a list of categorical column index.
+        dict_ = {'cat_index': [i for i, col in enumerate(df.columns)
+                               if col in cols_categorical and col != config.TARGET_NAME]}
+
+        # save to json file
+        with open(f'{dir_}/cat_index.json', 'w') as f:
+            json.dump(dict_, f)
+
+
+if __name__ == '__main__':
+    split_raw_data_to_train_test_pred_for_s3_catboost()
+    upload_directory_to_s3(f'{config.DIR_DATA}/data_for_s3_catboost',
+                           'misc-datasets-nvicol',
+                           'dataset-default-klrn')
+    print('')
+

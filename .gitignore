@@ -7,3 +7,4 @@ data
 
 # temp file produced by plotly
 temp-plot.html
+/sagemaker_catboost/sourcedir/

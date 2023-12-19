@@ -14,6 +14,8 @@ from typing import List
 DIR_PROJ = (Path(__file__) / '..').resolve()
 DIR_DATA = f'{DIR_PROJ}/data'
 DIR_ARTIFACTS = f'{DIR_PROJ}/artifacts'
+if not os.path.exists(DIR_ARTIFACTS):
+    os.makedirs(DIR_ARTIFACTS)
 
 # Data
 # ******************************************************************************
